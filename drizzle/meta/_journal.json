@@ -8,6 +8,13 @@
       "when": 1788684144694,
       "tag": "0000_shiny_harrier",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1788690973813,
+      "tag": "0001_talented_gateway",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `inquiries` ADD `notification_status` text DEFAULT 'not_sent' NOT NULL;
