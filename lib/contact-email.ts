@@ -61,8 +61,13 @@ export async function sendInquiryNotification(
     const matches = (items?: string[]) => Array.isArray(items)
       && items.some(item => typeof item === 'string' && normalizeAddress(item) === target);
     if (matches(payload.result?.permanent_bounces)) return 'failed';
-    return matches(payload.result?.delivered) || matches(payload.result?.queued)
-      ? 'accepted' : 'unknown';
+    if (matches(payload.result?.delivered) || matches(payload.result?.queued)) return 'accepted';
+    const statuses = [
+      ...(payload.result?.delivered || []),
+      ...(payload.result?.queued || []),
+      ...(payload.result?.permanent_bounces || []),
+    ];
+    return statuses.length === 0 ? 'accepted' : 'unknown';
   } catch {
     // A timed-out request may already have been accepted; never retry automatically.
     return 'unknown';
