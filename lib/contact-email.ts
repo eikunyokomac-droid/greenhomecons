@@ -24,7 +24,7 @@ export async function sendInquiryNotification(
 ): Promise<NotificationStatus> {
   if (!emailConfigured(config)) return 'not_configured';
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10000);
+  const timeout = setTimeout(() => controller.abort(), 20000);
   try {
     const response = await fetcher(
       `https://api.cloudflare.com/client/v4/accounts/${config.CLOUDFLARE_EMAIL_ACCOUNT_ID}/email/sending/send`,
@@ -57,9 +57,9 @@ export async function sendInquiryNotification(
       result?: {delivered?: string[]; queued?: string[]; permanent_bounces?: string[]};
     };
     if (!payload.success) return 'failed';
-    const target = config.CONTACT_TO_EMAIL!.toLowerCase();
+    const target = normalizeAddress(config.CONTACT_TO_EMAIL!);
     const matches = (items?: string[]) => Array.isArray(items)
-      && items.some(item => typeof item === 'string' && item.toLowerCase() === target);
+      && items.some(item => typeof item === 'string' && normalizeAddress(item) === target);
     if (matches(payload.result?.permanent_bounces)) return 'failed';
     return matches(payload.result?.delivered) || matches(payload.result?.queued)
       ? 'accepted' : 'unknown';
@@ -69,4 +69,10 @@ export async function sendInquiryNotification(
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function normalizeAddress(value: string): string {
+  const trimmed = value.trim().toLowerCase();
+  const match = trimmed.match(/<([^<>]+)>$/);
+  return (match?.[1] || trimmed).trim();
 }

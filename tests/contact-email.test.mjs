@@ -25,6 +25,13 @@ test('notification goes only to the configured inbox; visitor is Reply-To',async
   });
   assert.equal(result,'accepted');
 });
+test('delivery status accepts formatted recipient addresses',async()=>{
+  const result=await sendInquiryNotification(config,inquiry,async()=>Response.json({
+    success:true,
+    result:{delivered:['Greenhome <INFO@example.com>'],queued:[],permanent_bounces:[]},
+  }));
+  assert.equal(result,'accepted');
+});
 test('provider rejection and bounced recipients are failures',async()=>{
   assert.equal(await sendInquiryNotification(config,inquiry,async()=>Response.json({success:false},{status:403})),'failed');
   assert.equal(await sendInquiryNotification(config,inquiry,async()=>Response.json({success:true,result:{delivered:[],queued:[],permanent_bounces:[config.CONTACT_TO_EMAIL]}})),'failed');
