@@ -21,7 +21,8 @@ npm test
 Create a D1 database named `greenhome-consult`, then set its ID as the
 `CLOUDFLARE_D1_DATABASE_ID` build variable in Cloudflare Workers Builds.
 Cloudflare production builds use `npm run build:cloudflare` and deploy with
-`npx wrangler deploy`.
+`npm run deploy:cloudflare`. The deploy command applies the tracked D1
+migrations before publishing the Worker.
 
 ## Environment variables
 

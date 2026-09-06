@@ -22,11 +22,14 @@ export default defineConfig(async () => {
           main: "./worker/index.ts",
           name: "greenhome-consult",
           compatibility_date: "2026-09-06",
+          keep_vars: true,
           d1_databases: [
             {
               binding: "DB",
               database_name: "greenhome-consult",
               database_id: databaseId,
+              // The generated Worker config lives under dist/server.
+              migrations_dir: "../../drizzle",
             },
           ],
         },
