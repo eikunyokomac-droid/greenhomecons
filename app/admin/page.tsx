@@ -1,0 +1,7 @@
+import {env} from 'cloudflare:workers';
+import {requireChatGPTUser} from '../chatgpt-auth';
+import {contactDb} from '@/db/contact';
+export const dynamic='force-dynamic';
+export const metadata={title:'お問い合わせ管理｜グリーンホームコンサル',robots:{index:false,follow:false}};
+export default function Admin(){return <AdminContent/>}
+async function AdminContent(){const user=await requireChatGPTUser('/admin');const allowed=(env as unknown as {ADMIN_EMAIL?:string}).ADMIN_EMAIL;if(!allowed||user.email.toLowerCase()!==allowed.toLowerCase())return <main className="admin"><h1>お問い合わせ管理</h1><p>管理者として登録されたアカウントのみ閲覧できます。管理者メールアドレスが未設定の場合は、サイトの運用担当者へ設定をご依頼ください。</p><a href="/">ホームへ戻る</a></main>;try{const r=await contactDb().prepare('SELECT * FROM inquiries ORDER BY created_at DESC LIMIT 100').all<{id:string;name:string;email:string;phone:string;company:string;category:string;message:string;created_at:number}>();return <main className="admin"><a href="/">← ホームへ</a><h1>お問い合わせ</h1><p>新しい順に最大100件。メール通知は未設定です。</p>{r.results.length===0?<p>まだお問い合わせはありません。</p>:r.results.map(x=><article key={x.id}><p className="eyebrow">{new Date(x.created_at).toLocaleString('ja-JP',{timeZone:'Asia/Tokyo'})} ／ {x.category}</p><h2>{x.name}</h2><p>{x.company}</p><p>{x.email} ／ {x.phone||'電話番号なし'}</p><p>{x.message}</p><p className="micro">受付番号：{x.id}</p></article>)}</main>}catch{return <main className="admin"><h1>お問い合わせ管理</h1><p>現在一覧を取得できません。時間をおいて再読み込みしてください。</p></main>}}
