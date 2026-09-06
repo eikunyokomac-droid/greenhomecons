@@ -3,5 +3,13 @@
   "name": "greenhome-consult",
   "compatibility_date": "2026-09-06",
   "compatibility_flags": ["nodejs_compat"],
-  "keep_vars": true
+  "keep_vars": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "greenhome-consult",
+      "database_id": "c94d38af-4a7d-48f5-b4aa-19117895e188",
+      "migrations_dir": "drizzle"
+    }
+  ]
 }
