@@ -16,6 +16,13 @@ npm run build
 npm test
 ```
 
+## Cloudflare Workers
+
+Create a D1 database named `greenhome-consult`, then set its ID as the
+`CLOUDFLARE_D1_DATABASE_ID` build variable in Cloudflare Workers Builds.
+Cloudflare production builds use `npm run build:cloudflare` and deploy with
+`npx wrangler deploy`.
+
 ## Environment variables
 
 The contact form uses Cloudflare Email Sending. Configure secrets in the hosting environment and keep `.env` files out of Git.
