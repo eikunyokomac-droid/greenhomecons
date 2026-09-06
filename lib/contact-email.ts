@@ -22,7 +22,10 @@ export function emailConfigured(config: EmailConfig): boolean {
 export async function sendInquiryNotification(
   config: EmailConfig, inquiry: Inquiry, fetcher: typeof fetch = fetch,
 ): Promise<NotificationStatus> {
-  if (!emailConfigured(config)) return 'not_configured';
+  if (!emailConfigured(config)) {
+    console.warn('Contact email notification is not configured');
+    return 'not_configured';
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
   try {
@@ -51,16 +54,31 @@ export async function sendInquiryNotification(
         }),
       },
     );
-    if (!response.ok) return 'failed';
+    if (!response.ok) {
+      const errorPayload = await response.json().catch(() => null) as {
+        errors?: Array<{code?: number}>;
+      } | null;
+      console.error('Contact email notification was rejected', {
+        httpStatus: response.status,
+        providerCode: errorPayload?.errors?.[0]?.code ?? null,
+      });
+      return 'failed';
+    }
     const payload = await response.json() as {
       success?: boolean;
       result?: {delivered?: string[]; queued?: string[]; permanent_bounces?: string[]};
     };
-    if (!payload.success) return 'failed';
+    if (!payload.success) {
+      console.error('Contact email notification returned an unsuccessful response');
+      return 'failed';
+    }
     const target = normalizeAddress(config.CONTACT_TO_EMAIL!);
     const matches = (items?: string[]) => Array.isArray(items)
       && items.some(item => typeof item === 'string' && normalizeAddress(item) === target);
-    if (matches(payload.result?.permanent_bounces)) return 'failed';
+    if (matches(payload.result?.permanent_bounces)) {
+      console.error('Contact email notification permanently bounced');
+      return 'failed';
+    }
     if (matches(payload.result?.delivered) || matches(payload.result?.queued)) return 'accepted';
     const statuses = [
       ...(payload.result?.delivered || []),
@@ -68,8 +86,11 @@ export async function sendInquiryNotification(
       ...(payload.result?.permanent_bounces || []),
     ];
     return statuses.length === 0 ? 'accepted' : 'unknown';
-  } catch {
+  } catch (error) {
     // A timed-out request may already have been accepted; never retry automatically.
+    console.error('Contact email notification request failed', {
+      errorName: error instanceof Error ? error.name : 'unknown',
+    });
     return 'unknown';
   } finally {
     clearTimeout(timeout);
