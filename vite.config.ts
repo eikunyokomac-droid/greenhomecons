@@ -29,8 +29,15 @@ const localBindingConfig = {
           binding: r2,
           bucket_name: "site-creator-r2",
         },
-      ]
+    ]
     : [],
+  send_email: [
+    {
+      name: "EMAIL",
+      allowed_destination_addresses: ["info@greenhomecons.net"],
+      allowed_sender_addresses: ["info@greenhomecons.net"],
+    },
+  ],
 };
 
 export default defineConfig(async () => {

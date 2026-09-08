@@ -5,6 +5,15 @@ import handler from "vinext/server/app-router-entry";
 interface Env {
   ASSETS: Fetcher;
   DB: D1Database;
+  EMAIL: {
+    send(message: {
+      to: string;
+      from: string;
+      replyTo?: string;
+      subject: string;
+      text: string;
+    }): Promise<{ messageId: string }>;
+  };
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
