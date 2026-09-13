@@ -5,8 +5,9 @@ export const metadata: Metadata = {
   title: "グリーンホームコンサル｜建築・リフォームとITの相談窓口",
   description: "東京都青梅市を拠点に、施主の立場で建築・リフォームをサポート。長年の建築とITの経験で、小さな改装から事業の課題まで伴走します。",
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: "/favicon-mark.png",
+    shortcut: "/favicon-mark.png",
+    apple: "/favicon-mark.png",
   },
 };
 
